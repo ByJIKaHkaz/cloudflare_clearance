@@ -5,7 +5,7 @@ module Helpers
   end
 
   VALID_CFUID_COOKIE = CloudflareClearance::Cookie.new(
-    name: "__cfduid",
+    name: "__cf_bm",
     value: "d3a556ffc236de0081560fdad9f09fc0d1524516021",
     path: "/",
     domain: ".foo",

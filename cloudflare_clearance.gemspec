@@ -28,7 +28,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "pry"
   spec.add_development_dependency "pry-byebug"
   spec.add_development_dependency "pry-coolline"
-  spec.add_development_dependency "selenium-webdriver"
   spec.add_development_dependency "redcarpet"
   spec.add_development_dependency "yard"
   spec.add_development_dependency "execjs"

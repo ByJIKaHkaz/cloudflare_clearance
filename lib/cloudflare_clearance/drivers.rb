@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 require 'cloudflare_clearance/exceptions'
-require 'cloudflare_clearance/drivers/selenium'
 require 'cloudflare_clearance/drivers/exec_js'
 
 
@@ -13,13 +12,12 @@ module CloudflareClearance
     end
 
     def self.best_available
-      drivers.reject(&:deprecated?).find(&:available?)
+      drivers.find(&:available?)
     end
 
     def self.drivers
       @drivers || [
-        ExecJs,
-        Selenium
+        ExecJs
       ]
     end
 

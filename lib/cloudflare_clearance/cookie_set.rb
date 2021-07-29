@@ -1,4 +1,5 @@
 require "cloudflare_clearance/cookie"
+require "cloudflare_clearance/exceptions"
 
 module CloudflareClearance
   CookieSet = Struct.new(:cf_duid, :cf_clearance, :other, keyword_init: true) do
@@ -14,12 +15,13 @@ module CloudflareClearance
     def self.from_cookiehash(cookiehash)
       cookies = cookiehash.map { |c| Cookie.new(c) }
 
-      cf_duid_cookie = cookies.find{ |c| c.name.eql? "__cfduid" }
-      raise CookieError, "__cfduid is not set" unless cf_duid_cookie
+      cf_duid_cookie = cookies.find{ |c| c.name.eql? "__cf_bm" }
+      puts 'Cookies'
+      puts cookies
 
+      raise CookieError, "__cf_bm is not set" unless cf_duid_cookie
       cf_clearance_cookie = cookies.find{ |c| c.name.eql? "cf_clearance" }
       raise CookieError, "cf_clearance is not set" unless cf_clearance_cookie
-
       other_cookies = cookies.reject do |c|
         (c.eql? cf_duid_cookie) || (c.eql? cf_clearance_cookie)
       end

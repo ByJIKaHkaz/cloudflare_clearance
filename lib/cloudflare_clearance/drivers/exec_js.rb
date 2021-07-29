@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+require 'cloudflare_clearance/exceptions'
 require 'cloudflare_clearance/drivers/driver'
 require 'cloudflare_clearance/http_adapter/net_http'
 
@@ -32,12 +33,15 @@ module CloudflareClearance
       challenge_response = initial_request uri
 
       challenge_cookies = challenge_response.header["Set-Cookie"]
+      puts 'Cookies challenge_response'
+      puts challenge_response
 
-      unless (challenge_cookies&.include?("__cfduid"))
-        raise ClearanceError, "__cfduid Cookie was not set. Is it a Cloudflare protected page?"
+      unless (challenge_cookies&.include?("__cf_bm"))
+        raise ClearanceError, "__cf_bm Cookie was not set. Is it a Cloudflare protected page?"
       end
 
       answer = @challenge_solver.solve(body: challenge_response.body, domain: uri.host, timeout: seconds_wait_retry)
+
 
     end
 
@@ -71,7 +75,10 @@ module CloudflareClearance
         header['Referer'] = uri.host
 
         antibot_response = adapter.get(uri, header)
-        raise "__cfduid Cookie was not set. Is it a Cloudflare protected page?" unless antibot_response.header["Set-Cookie"]&.include? "__cfduid"
+        puts 'Cookies antibot_response'
+        puts antibot_response
+  
+        raise "__cf_bm Cookie was not set. Is it a Cloudflare protected page?" unless antibot_response.header["Set-Cookie"]&.include? "__cf_bm"
 
         answer = challenge ? challenge.solve(body: antibot_response.body.to_s, domain: uri.host) : JsChallenge.solve(body: antibot_response.body.to_s, domain: uri.host)
 
@@ -80,6 +87,7 @@ module CloudflareClearance
 
         clearance_response = adapter.get(cfuri, header)
         raise "cf_clearance Cookie was not set." unless clearance_response.header["Set-Cookie"]&.include? "cf_clearance"
+
 
         return ClearanceData.new(USER_AGENT, HTTP::Cookie.parse(clearance_response.header["Set-Cookie"], uri).detect{ |c| c.name.eql? "cf_clearance"} )
       end
